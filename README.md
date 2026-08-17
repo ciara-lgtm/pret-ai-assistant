@@ -25,25 +25,58 @@ This initial version includes:
 
 ## Local run
 
-### Backend
+### 1) Backend setup
 
-```bash
-cd pret-ai-assistant
-python -m venv .venv
-# Windows
-.venv\Scripts\activate
-pip install -r backend/requirements.txt
+Use Python 3.13 for this project. Python 3.14 can fail while building `pydantic-core`.
+
+```cmd
+cd /d "C:\Users\alexh\OneDrive\Documents\Ciara jobs\Pret-AI-Assistant\pret-ai-assistant"
+uv venv --python 3.13 --seed .venv
+.venv\Scripts\activate.bat
+python -m pip install --upgrade pip
+python -m pip install -r backend/requirements.txt
+```
+
+### 2) Start the backend
+
+```cmd
+cd /d "C:\Users\alexh\OneDrive\Documents\Ciara jobs\Pret-AI-Assistant\pret-ai-assistant"
+.venv\Scripts\activate.bat
 uvicorn app.main:app --app-dir backend --reload
 ```
 
-The application exposes the health endpoint at:
-- GET /health
+The backend will run at:
+- http://127.0.0.1:8000
+- health check: http://127.0.0.1:8000/health
 
-### Frontend
+### 3) Run backend tests
 
-```bash
-cd pret-ai-assistant/frontend
+```cmd
+cd /d "C:\Users\alexh\OneDrive\Documents\Ciara jobs\Pret-AI-Assistant\pret-ai-assistant"
+.venv\Scripts\activate.bat
+python -m pytest backend/tests -q
+```
+
+### 4) Frontend setup and run
+
+```cmd
+cd /d "C:\Users\alexh\OneDrive\Documents\Ciara jobs\Pret-AI-Assistant\pret-ai-assistant\frontend"
 npm install
 npm run dev -- --host 0.0.0.0
+```
+
+The frontend will run in the terminal output shown by Vite, usually on a local port such as http://localhost:5173.
+
+### Quick reminder
+
+If the venv is missing or broken, recreate it with:
+
+```cmd
+cd /d "C:\Users\alexh\OneDrive\Documents\Ciara jobs\Pret-AI-Assistant\pret-ai-assistant"
+rmdir /s /q .venv
+uv venv --python 3.13 --seed .venv
+.venv\Scripts\activate.bat
+python -m pip install --upgrade pip
+python -m pip install -r backend/requirements.txt
 ```
 
