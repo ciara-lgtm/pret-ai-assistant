@@ -1,26 +1,32 @@
-function MessageBubble({ message }) {
-  const lines = message.text.split('\n');
+import ReactMarkdown from 'react-markdown';
+import rehypeSanitize from 'rehype-sanitize';
+import remarkGfm from 'remark-gfm';
 
+function normalizeEscapedMarkdown(value) {
+  return value
+    .replace(/\\(?=#{1,6}\s)/g, '')
+    .replace(/\\(?=\*\*)/g, '')
+    .replace(/\\(?=-\s)/g, '')
+    .replace(/\\(?=\d+[.)]\s)/g, '');
+}
+
+function MessageBubble({ message }) {
   return (
     <article className={`message ${message.role} ${message.isError ? 'error-message' : ''}`}>
       {message.role === 'assistant' && (
         <span className="message-avatar" aria-hidden="true">P</span>
       )}
       <div className="message-content">
-        {lines.map((line, index) => {
-          const numberedItem = line.match(/^(\d+)[.)]\s+(.*)$/);
-
-          if (numberedItem) {
-            return (
-              <div className="numbered-line" key={`${message.id}-${index}`}>
-                <span>{numberedItem[1]}.</span>
-                <p>{numberedItem[2]}</p>
-              </div>
-            );
-          }
-
-          return <p key={`${message.id}-${index}`}>{line || '\u00a0'}</p>;
-        })}
+        {message.role === 'assistant' ? (
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeSanitize]}
+          >
+            {normalizeEscapedMarkdown(message.text)}
+          </ReactMarkdown>
+        ) : (
+          <p>{message.text}</p>
+        )}
       </div>
     </article>
   );

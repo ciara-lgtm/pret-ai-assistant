@@ -13,14 +13,22 @@ from app.services.local_knowledge_retriever import local_knowledge_retriever
 
 router = APIRouter(prefix="/api/v1", tags=["chat"])
 
+_chat_service: ChatService | None = None
+
 
 def get_chat_service() -> ChatService:
     """Provide the configured AI-backed ChatService for the route layer."""
+    global _chat_service
+    if _chat_service is not None:
+        return _chat_service
+
     use_fake_ai = os.getenv("USE_FAKE_AI", "true").lower() not in {"0", "false", "no"}
     if use_fake_ai:
-        return ChatService(fake_ai_service(), retriever=local_knowledge_retriever())
+        _chat_service = ChatService(fake_ai_service(), retriever=local_knowledge_retriever())
+        return _chat_service
 
-    return ChatService(azure_ai_service(), retriever=local_knowledge_retriever())
+    _chat_service = ChatService(azure_ai_service(), retriever=local_knowledge_retriever())
+    return _chat_service
 
 
 @router.post("/chat", response_model=ChatResponse)
