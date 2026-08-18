@@ -1,10 +1,17 @@
 from __future__ import annotations
 
+from pathlib import Path
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes.chat import router as chat_router
 from app.api.routes.health import router as health_router
+
+# Load .env file from project root (one level up from backend/)
+env_path = Path(__file__).parent.parent.parent / ".env"
+load_dotenv(env_path)
 
 app = FastAPI(
     title="Pret AI Assistant",
