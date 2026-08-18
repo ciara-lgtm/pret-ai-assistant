@@ -9,19 +9,19 @@ This repository contains the initial project skeleton for a production-quality p
 - backend/app/services/: business-facing service layer. These modules encapsulate logic and remain independent from transport concerns.
 - backend/app/models/: typed response and data models. This makes the API contract explicit and easy to extend.
 - backend/tests/: automated tests for the backend layer.
-- frontend/: React application shell for the prototype UI. It contains the chat interface and supporting components without any AI functionality yet.
+- frontend/: React application for the Pret Employee Assistant chat UI. It calls the existing backend chat API through the Vite development proxy.
 - data/knowledge/: placeholder for Pret knowledge, troubleshooting guidance, and reusable reference material.
 - .env.example: environment variable template for local development without storing real secrets.
 - .gitignore: excludes virtual environments, dependencies, build artifacts, caches, and editor settings.
 
 ## Current implementation
 
-This initial version includes:
+This version includes:
 - a FastAPI app with a clean entry point
 - a GET /health endpoint returning a simple JSON health response
-- a basic pytest health test
-- a React app that renders a placeholder chat interface
-- a minimal, extensible project structure ready for future feature work
+- a POST /api/v1/chat endpoint
+- local Markdown knowledge retrieval and the mock equipment-ticket workflow
+- a Pret-branded React chat interface connected to the backend
 
 ## Local run
 
@@ -58,12 +58,12 @@ Do not commit real secrets. Keep `.env` local only.
 
 ### 3) Start the backend
 
+For local development without Azure credentials, leave `USE_FAKE_AI=true` in `.env`.
+The application loads `.env` automatically from the project root.
+
 ```cmd
 cd /d "C:\Users\alexh\OneDrive\Documents\Ciara jobs\Pret-AI-Assistant\pret-ai-assistant"
 .venv\Scripts\activate.bat
-set -a
-for /f "usebackq delims=" %i in (.env) do set %i
-set +a
 uvicorn app.main:app --app-dir backend --reload
 ```
 
@@ -84,10 +84,12 @@ python -m pytest backend/tests -q
 ```cmd
 cd /d "C:\Users\alexh\OneDrive\Documents\Ciara jobs\Pret-AI-Assistant\pret-ai-assistant\frontend"
 npm install
-npm run dev -- --host 0.0.0.0
+npm run dev
 ```
 
-The frontend will run in the terminal output shown by Vite, usually on a local port such as http://localhost:5173.
+The frontend runs at http://localhost:5173. During development, Vite proxies `/api` requests to the backend at http://127.0.0.1:8000.
+
+Run the backend and frontend in separate terminals.
 
 ### Quick reminder
 
