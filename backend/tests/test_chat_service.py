@@ -13,7 +13,8 @@ class StubAIService:
         knowledge_context: list[KnowledgeChunk],
     ) -> AIResponse:
         assert conversation[0].content == "The coffee machine is broken"
-        assert knowledge_context == []
+        assert knowledge_context
+        assert any("coffee_machine_broken.md" in chunk.source for chunk in knowledge_context)
         return AIResponse(message="I can help with that.")
 
 

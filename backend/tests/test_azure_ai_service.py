@@ -68,6 +68,59 @@ def test_azure_ai_service_successful_response(monkeypatch: pytest.MonkeyPatch) -
     assert result.message == "Operational help here."
 
 
+def test_azure_ai_service_includes_retrieved_knowledge_and_source(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("AZURE_OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("AZURE_OPENAI_ENDPOINT", "https://example.openai.azure.com/")
+    monkeypatch.setenv("AZURE_OPENAI_DEPLOYMENT", "pret-assistant-poc")
+
+    client = StubAzureClient(output_text="Need more detail.")
+    service = AzureAIService(client=client)
+    knowledge = [
+        KnowledgeChunk(content="Stop using the machine if normal operation is not possible.", source="coffee_machine_broken.md")
+    ]
+
+    asyncio.run(
+        service.generate_response(
+            [ChatMessage(role="user", content="The coffee machine is broken")],
+            knowledge,
+        )
+    )
+
+    payload = client.calls[0]
+    json_data = payload["json"]
+    messages = json_data["input"]
+    assert messages[0]["type"] == "message"
+    assert messages[0]["role"] == "system"
+    assert "Pret Employee Assistant" in messages[0]["content"]
+    assert messages[1]["role"] == "system"
+    assert "Retrieved knowledge" in messages[1]["content"]
+    assert "coffee_machine_broken.md" in messages[1]["content"]
+    assert "Stop using the machine if normal operation is not possible." in messages[1]["content"]
+    assert messages[2]["type"] == "message"
+    assert messages[2]["content"] == "The coffee machine is broken"
+
+
+def test_azure_ai_service_allows_empty_knowledge_context(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("AZURE_OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv("AZURE_OPENAI_ENDPOINT", "https://example.openai.azure.com/")
+    monkeypatch.setenv("AZURE_OPENAI_DEPLOYMENT", "pret-assistant-poc")
+
+    client = StubAzureClient(output_text="General response.")
+    service = AzureAIService(client=client)
+    asyncio.run(
+        service.generate_response(
+            [ChatMessage(role="user", content="Hello there")],
+            [],
+        )
+    )
+
+    payload = client.calls[0]
+    json_data = payload["json"]
+    messages = json_data["input"]
+    assert messages[0]["role"] == "system"
+    assert messages[1]["content"] == "Hello there"
+
+
 def test_azure_ai_service_includes_system_instructions(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("AZURE_OPENAI_API_KEY", "test-key")
     monkeypatch.setenv("AZURE_OPENAI_ENDPOINT", "https://example.openai.azure.com/")
