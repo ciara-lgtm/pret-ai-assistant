@@ -37,11 +37,33 @@ python -m pip install --upgrade pip
 python -m pip install -r backend/requirements.txt
 ```
 
-### 2) Start the backend
+### 2) Configure Azure/Foundry connection
+
+Create a local `.env` file from `.env.example` and provide the real values for your Microsoft Foundry deployment.
+
+```env
+USE_FAKE_AI=false
+AZURE_OPENAI_ENDPOINT=https://<your-resource-name>.openai.azure.com/
+AZURE_OPENAI_API_KEY=<your-api-key>
+AZURE_OPENAI_DEPLOYMENT=pret-assistant-poc
+```
+
+Required values:
+- `AZURE_OPENAI_ENDPOINT` — the Azure OpenAI resource endpoint
+- `AZURE_OPENAI_API_KEY` — the API key for the resource
+- `AZURE_OPENAI_DEPLOYMENT` — the deployment name, currently `pret-assistant-poc`
+- `USE_FAKE_AI` — set to `false` to use the real provider; leave as `true` for local tests or fake-mode development
+
+Do not commit real secrets. Keep `.env` local only.
+
+### 3) Start the backend
 
 ```cmd
 cd /d "C:\Users\alexh\OneDrive\Documents\Ciara jobs\Pret-AI-Assistant\pret-ai-assistant"
 .venv\Scripts\activate.bat
+set -a
+for /f "usebackq delims=" %i in (.env) do set %i
+set +a
 uvicorn app.main:app --app-dir backend --reload
 ```
 
@@ -49,7 +71,7 @@ The backend will run at:
 - http://127.0.0.1:8000
 - health check: http://127.0.0.1:8000/health
 
-### 3) Run backend tests
+### 4) Run backend tests
 
 ```cmd
 cd /d "C:\Users\alexh\OneDrive\Documents\Ciara jobs\Pret-AI-Assistant\pret-ai-assistant"
@@ -57,7 +79,7 @@ cd /d "C:\Users\alexh\OneDrive\Documents\Ciara jobs\Pret-AI-Assistant\pret-ai-as
 python -m pytest backend/tests -q
 ```
 
-### 4) Frontend setup and run
+### 5) Frontend setup and run
 
 ```cmd
 cd /d "C:\Users\alexh\OneDrive\Documents\Ciara jobs\Pret-AI-Assistant\pret-ai-assistant\frontend"

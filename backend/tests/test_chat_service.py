@@ -29,3 +29,12 @@ def test_chat_service_uses_ai_service() -> None:
     assert response.conversation_id == "conv-42"
     assert response.message == "I can help with that."
     assert response.status == "success"
+
+
+def test_chat_service_generates_default_conversation_id() -> None:
+    service = ChatService(StubAIService())
+
+    response = asyncio.run(service.process_message(ChatRequest(message="The coffee machine is broken")))
+
+    assert response.conversation_id.startswith("conversation-")
+    assert response.status == "success"
