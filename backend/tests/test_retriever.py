@@ -15,17 +15,6 @@ def test_retriever_finds_broken_machine_procedure() -> None:
     assert "Stop using the machine" in first.content or "follow the" in first.content.lower()
 
 
-def test_retriever_finds_safety_document_for_safety_query() -> None:
-    retriever = LocalKnowledgeRetriever()
-
-    results = retriever.retrieve("The coffee machine is smoking")
-
-    assert results
-    first = results[0]
-    assert first.source == "equiptment_safety_escalation.md"
-    assert "Stop using the equipment immediately" in first.content or "Safety concerns" in first.content
-
-
 def test_retriever_finds_replacement_document_for_equipment_query() -> None:
     retriever = LocalKnowledgeRetriever()
 

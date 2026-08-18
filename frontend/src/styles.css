@@ -176,6 +176,49 @@ textarea {
   white-space: pre-wrap;
 }
 
+.message-content > :first-child {
+  margin-top: 0;
+}
+
+.message-content > :last-child {
+  margin-bottom: 0;
+}
+
+.message-content h1,
+.message-content h2,
+.message-content h3 {
+  margin: 0.2rem 0 0.65rem;
+  color: var(--pret-red-dark);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.message-content h1 {
+  font-size: 1.35rem;
+}
+
+.message-content h2 {
+  font-size: 1.2rem;
+}
+
+.message-content h3 {
+  font-size: 1.05rem;
+}
+
+.message-content ul,
+.message-content ol {
+  margin: 0.45rem 0;
+  padding-left: 1.35rem;
+}
+
+.message-content li {
+  margin: 0.2rem 0;
+}
+
+.message-content strong {
+  font-weight: 700;
+}
+
 .message.user {
   align-self: flex-end;
   border-radius: 16px 5px 16px 16px;
