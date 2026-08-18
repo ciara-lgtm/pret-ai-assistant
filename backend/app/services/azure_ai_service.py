@@ -21,10 +21,43 @@ class AzureAIService:
         self.api_key = os.getenv("AZURE_OPENAI_API_KEY")
         self.deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
 
-    def _build_messages(self, conversation: list[ChatMessage]) -> list[dict[str, str]]:
+    def _build_context_message(self, knowledge_context: list[KnowledgeChunk]) -> dict[str, str]:
+        """Build a system message containing retrieved knowledge for the model."""
+        if not knowledge_context:
+            return {}
+
+        context_lines = [
+            "Use the retrieved knowledge as the source of truth for Pret-specific procedures. Answer using this context where relevant. Do not invent Pret policies or procedures. If the answer is not available in the retrieved knowledge, say that the information is not available rather than making up a Pret-specific answer. General conversational responses are still allowed where appropriate.",
+            "",
+            "Retrieved knowledge:",
+        ]
+
+        for chunk in knowledge_context:
+            source = chunk.source or "unknown-source"
+            context_lines.append(f"[Source: {source}]")
+            context_lines.append(chunk.content.strip())
+            context_lines.append("")
+
+        return {
+            "type": "message",
+            "role": "system",
+            "content": "\n".join(context_lines).strip(),
+        }
+
+    def _build_messages(
+        self,
+        conversation: list[ChatMessage],
+        knowledge_context: list[KnowledgeChunk] | None = None,
+    ) -> list[dict[str, str]]:
         messages: list[dict[str, str]] = [
             {"type": "message", "role": "system", "content": SYSTEM_INSTRUCTIONS}
         ]
+
+        if knowledge_context:
+            context_message = self._build_context_message(knowledge_context)
+            if context_message:
+                messages.append(context_message)
+
         for message in conversation:
             messages.append({
                 "type": "message",
@@ -44,7 +77,7 @@ class AzureAIService:
 
         try:
             payload = {
-                "input": self._build_messages(conversation),
+                "input": self._build_messages(conversation, knowledge_context),
                 "model": self.deployment,
                 "temperature": 0.2,
             }

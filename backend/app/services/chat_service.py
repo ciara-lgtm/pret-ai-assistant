@@ -4,13 +4,16 @@ import uuid
 
 from app.models.chat import AIResponse, ChatMessage, ChatRequest, ChatResponse, KnowledgeChunk
 from app.services.ai_service import AIService
+from app.services.local_knowledge_retriever import LocalKnowledgeRetriever
+from app.services.retriever import Retriever
 
 
 class ChatService:
-    """Orchestrates chat requests and delegates AI generation to a provider-specific service."""
+    """Orchestrates chat requests, retrieves relevant knowledge, and delegates AI generation."""
 
-    def __init__(self, ai_service: AIService) -> None:
+    def __init__(self, ai_service: AIService, retriever: Retriever | None = None) -> None:
         self.ai_service = ai_service
+        self.retriever = retriever or LocalKnowledgeRetriever()
 
     async def process_message(self, request: ChatRequest) -> ChatResponse:
         """Process a user message and return a typed assistant reply."""
@@ -19,7 +22,7 @@ class ChatService:
         messages = [
             ChatMessage(role="user", content=request.message),
         ]
-        knowledge_context: list[KnowledgeChunk] = []
+        knowledge_context = self.retriever.retrieve(request.message)
 
         response: AIResponse = await self.ai_service.generate_response(messages, knowledge_context)
 

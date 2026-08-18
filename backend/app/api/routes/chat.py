@@ -9,6 +9,7 @@ from app.services.ai_service import AIServiceError
 from app.services.azure_ai_service import azure_ai_service
 from app.services.chat_service import ChatService
 from app.services.fake_ai_service import fake_ai_service
+from app.services.local_knowledge_retriever import local_knowledge_retriever
 
 router = APIRouter(prefix="/api/v1", tags=["chat"])
 
@@ -17,9 +18,9 @@ def get_chat_service() -> ChatService:
     """Provide the configured AI-backed ChatService for the route layer."""
     use_fake_ai = os.getenv("USE_FAKE_AI", "true").lower() not in {"0", "false", "no"}
     if use_fake_ai:
-        return ChatService(fake_ai_service())
+        return ChatService(fake_ai_service(), retriever=local_knowledge_retriever())
 
-    return ChatService(azure_ai_service())
+    return ChatService(azure_ai_service(), retriever=local_knowledge_retriever())
 
 
 @router.post("/chat", response_model=ChatResponse)
