@@ -23,6 +23,15 @@ This version includes:
 - local Markdown knowledge retrieval and the mock equipment-ticket workflow
 - a Pret-branded React chat interface connected to the backend
 
+## Clone the project
+
+Replace `<repository-url>` with the repository's Git URL:
+
+```bash
+git clone <repository-url>
+cd pret-ai-assistant
+```
+
 ## Local run
 
 ### 1) Backend setup
@@ -30,7 +39,7 @@ This version includes:
 Use Python 3.13 for this project. Python 3.14 can fail while building `pydantic-core`.
 
 ```cmd
-cd /d "C:\Users\alexh\OneDrive\Documents\Ciara jobs\Pret-AI-Assistant\pret-ai-assistant"
+cd pret-ai-assistant
 uv venv --python 3.13 --seed .venv
 .venv\Scripts\activate.bat
 python -m pip install --upgrade pip
@@ -62,7 +71,7 @@ For local development without Azure credentials, leave `USE_FAKE_AI=true` in `.e
 The application loads `.env` automatically from the project root.
 
 ```cmd
-cd /d "C:\Users\alexh\OneDrive\Documents\Ciara jobs\Pret-AI-Assistant\pret-ai-assistant"
+cd pret-ai-assistant
 .venv\Scripts\activate.bat
 uvicorn app.main:app --app-dir backend --reload
 ```
@@ -74,7 +83,7 @@ The backend will run at:
 ### 4) Run backend tests
 
 ```cmd
-cd /d "C:\Users\alexh\OneDrive\Documents\Ciara jobs\Pret-AI-Assistant\pret-ai-assistant"
+cd pret-ai-assistant
 .venv\Scripts\activate.bat
 python -m pytest backend/tests -q
 ```
@@ -82,7 +91,7 @@ python -m pytest backend/tests -q
 ### 5) Frontend setup and run
 
 ```cmd
-cd /d "C:\Users\alexh\OneDrive\Documents\Ciara jobs\Pret-AI-Assistant\pret-ai-assistant\frontend"
+cd pret-ai-assistant\frontend
 npm install
 npm run dev
 ```
@@ -96,7 +105,7 @@ Run the backend and frontend in separate terminals.
 If the venv is missing or broken, recreate it with:
 
 ```cmd
-cd /d "C:\Users\alexh\OneDrive\Documents\Ciara jobs\Pret-AI-Assistant\pret-ai-assistant"
+cd pret-ai-assistant
 rmdir /s /q .venv
 uv venv --python 3.13 --seed .venv
 .venv\Scripts\activate.bat
